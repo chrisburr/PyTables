@@ -237,10 +237,11 @@ def lazyattr(fget):
 
     def newfget(self):
         mydict = self.__dict__
-        if name in mydict:
+        try:
             return mydict[name]
-        mydict[name] = value = fget(self)
-        return value
+        except KeyError:
+            mydict[name] = value = fget(self)
+            return value
 
     return property(newfget, None, None, fget.__doc__)
 

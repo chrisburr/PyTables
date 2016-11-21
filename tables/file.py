@@ -1533,15 +1533,22 @@ class File(hdf5extension.File, object):
         return elink
 
 
-    def _get_node(self, nodepath):
-        # The root node is always at hand.
-        if nodepath == '/':
-            return self.root
+    def _get_node(self, nodepath, cache={}):
+        try:
+            return cache[nodepath]
+        except KeyError:
+            # The root node is always at hand.
+            if nodepath == '/':
+                return self.root
 
-        node = self._node_manager.get_node(nodepath)
-        assert node is not None, "unable to instantiate node ``%s``" % nodepath
+            node = self._node_manager.get_node(nodepath)
+            assert node is not None, \
+                "unable to instantiate node ``%s``" % nodepath
 
-        return node
+            # Cache the node for next time
+            cache[nodepath] = node
+
+            return node
 
 
     def get_node(self, where, name=None, classname=None):
